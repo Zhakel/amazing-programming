@@ -261,3 +261,405 @@ int lengthOfLongestSubstring(string s) {
     return maxLen;
 }
 ```
+#### [*Median of Two Sorted Arrays](https://leetcode.com/problems/median-of-two-sorted-arrays)   
+
+> There are two sorted arrays **nums1** and **nums2** of size m and n respectively.
+>
+> Find the median of the two sorted arrays. The overall run time complexity should be O(log (m+n)).
+>
+> **Example 1:**
+>
+> ```
+> nums1 = [1, 3]
+> nums2 = [2]
+>
+> The median is 2.0
+> ```
+>
+> **Example 2:**
+>
+> ```
+> nums1 = [1, 2]
+> nums2 = [3, 4]
+>
+> The median is (2 + 3)/2 = 2.5
+> ```
+
+```c++
+
+```
+
+
+#### [Longest Palindromic Substring](https://leetcode.com/problems/longest-palindromic-substring/) 
+
+> Given a string **s**, find the longest palindromic substring in **s**. You may assume that the maximum length of **s** is 1000.
+>
+> **Example:**
+>
+> ```
+> Input: "babad"
+>
+> Output: "bab"
+>
+> Note: "aba" is also a valid answer.
+>
+> ```
+>
+> **Example:**
+>
+> ```
+> Input: "cbbd"
+>
+> Output: "bb"
+> ```
+
+```c++
+string longestPalindrome(string s) {
+    int i,j,index,longest=0;
+    string res;
+    index=s.length()-1;
+    for(;index>=0;index--){
+      j=index;
+      i=index-1;
+      while(i>=0&&s[i]==s[j]&&j<s.length()){
+        i--;
+        j++;
+      }
+      if(longest<j-i-1){
+        longest = j-i-1;
+        res = s.substr(i+1,longest);
+      }
+      // longest = longest>=(j-i-1)?longest:(j-i-1);
+      i=index-1;
+      j=index+1;
+      while(i>=0&&j<s.length()&&s[i]==s[j]){
+        i--;
+        j++;
+      }
+      if(longest<j-i-1){
+        longest = j-i-1;
+        res = s.substr(i+1,longest); 
+      }
+      // longest = longest>=(j-i-1)?longest:(j-i-1);
+    }
+    return res;
+}//12ms
+```
+
+```c++
+//别人家的代码
+string longestPalindrome(string s) {
+    if (s.empty()) return "";
+    if (s.size() == 1) return s;
+    int min_start = 0, max_len = 1;
+    for (int i = 0; i < s.size();) {
+      if (s.size() - i <= max_len / 2) break;
+      int j = i, k = i;
+      while (k < s.size()-1 && s[k+1] == s[k]) ++k; // Skip duplicate characters.
+      i = k+1;
+      while (k < s.size()-1 && j > 0 && s[k + 1] == s[j - 1]) { ++k; --j; } // Expand.
+      int new_len = k - j + 1;
+      if (new_len > max_len) { min_start = j; max_len = new_len; }
+    }
+    return s.substr(min_start, max_len);
+}
+```
+
+
+
+#### [ZigZag Conversion](https://leetcode.com/problems/zigzag-conversion/) 
+
+The string `"PAYPALISHIRING"` is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+```
+P   A   H   N
+A P L S I I G
+Y   I   R
+
+```
+
+And then read line by line: `"PAHNAPLSIIGYIR"` 
+
+Write the code that will take a string and make this conversion given a number of rows:
+
+```
+string convert(string text, int nRows);
+```
+
+`convert("PAYPALISHIRING", 3)` should return `"PAHNAPLSIIGYIR"` 
+
+```c++
+class Solution {
+public:
+    string convert(string s, int numRows) {
+    	if (numRows == 1)
+    		return s;
+        char res[s.length()+1];
+    	int j = 0, step,sp;
+    	for (int i = 1;i <= numRows;i++) {
+    		int index = i;
+    		step = 2 * numRows - 2;
+    		sp = step-2*i+2;
+    		while (index <= s.length()) {
+    			res[j++] = s[index - 1];
+    			//cout << s[index - 1] << endl;
+    			if(i==1||i==numRows)
+                    index+=step;
+                else{
+                    index += sp;
+                    sp = step -sp;
+                }
+    		}
+    	}
+    	res[s.length()] = '\0';
+    	return res;
+    }
+};//16ms
+```
+
+```c++
+//别人家的代码
+string convert(string s, int nRows) {
+    
+    if (nRows <= 1)
+        return s;
+
+    const int len = (int)s.length();
+    string *str = new string[nRows];
+
+    int row = 0, step = 1;
+    for (int i = 0; i < len; ++i)
+    {
+        str[row].push_back(s[i]);
+
+        if (row == 0)
+            step = 1;
+        else if (row == nRows - 1)
+            step = -1;
+
+        row += step;
+    }
+
+    s.clear();
+    for (int j = 0; j < nRows; ++j)
+    {
+        s.append(str[j]);
+    }
+
+    delete[] str;
+    return s;
+}
+```
+
+
+
+#### [Reverse Integer](https://leetcode.com/problems/reverse-integer/) 
+
+> Reverse digits of an integer.
+>
+> **Example1:** x = 123, return 321
+> **Example2:** x = -123, return -321
+>
+> [click to show spoilers.](https://leetcode.com/problems/reverse-integer/#)
+>
+> **Note:**
+> The input is assumed to be a 32-bit signed integer. Your function should **return 0 when the reversed integer overflows**.
+
+```c++
+class Solution {
+public:
+    int reverse(int x) {
+        bool sign = false;
+        if(x<0){
+            x=-x;
+            sign = true;
+        }
+        int max = INT_MAX/10;
+        int max_t = INT_MAX%10;
+        if(sign)
+            max_t = -(INT_MIN%10);
+        int res=0;
+
+        while(x>0){
+            if(res>max||(res==max&&x>max_t))
+                return 0;
+            res = 10*res+x%10;
+            x/=10;
+        }
+        if(sign)
+            res = -res;
+        return res;
+    }
+};//12ms
+```
+
+```java
+//别人家的代码
+public int reverse(int x)
+{
+    int result = 0;
+
+    while (x != 0)
+    {
+        int tail = x % 10;
+        int newResult = result * 10 + tail;
+        if ((newResult - tail) / 10 != result)
+        { return 0; }
+        result = newResult;
+        x = x / 10;
+    }
+
+    return result;
+}
+```
+
+
+
+#### [String to Integer (atoi)](https://leetcode.com/problems/string-to-integer-atoi/) 
+
+> Implement atoi to convert a string to an integer.
+>
+> **Hint:** Carefully consider all possible input cases. If you want a challenge, please do not see below and ask yourself what are the possible input cases.
+>
+> **Notes:** It is intended for this problem to be specified vaguely (ie, no given input specs). You are responsible to gather all the input requirements up front.
+>
+> **Update (2015-02-10):**
+> The signature of the `C++` function had been updated. If you still see your function signature accepts a `const char *` argument, please click the reload button  to reset your code definition.
+>
+> **Requirements for atoi:**The function first discards as many whitespace characters as necessary until the first non-whitespace character is found. Then, starting from this character, takes an optional initial plus or minus sign followed by as many numerical digits as possible, and interprets them as a numerical value.The string can contain additional characters after those that form the integral number, which are ignored and have no effect on the behavior of this function.If the first sequence of non-whitespace characters in str is not a valid integral number, or if no such sequence exists because either str is empty or it contains only whitespace characters, no conversion is performed.If no valid conversion could be performed, a zero value is returned. If the correct value is out of the range of representable values, INT_MAX (2147483647) or INT_MIN (-2147483648) is returned.
+
+```c++
+class Solution {
+public:
+    int myAtoi(string str) {
+        if(str=="")
+            return 0;
+        int i=0;
+        long long res=0;
+        int sign = 0;
+        while(str[i]==' '){
+            i++;
+        };
+        if(str[i]=='+'||str[i]=='-'){
+            if(str[i]=='+'){
+                sign = 1;
+            }else
+                sign = 2;
+            i++;
+        }
+        char c;
+        do{
+            c = str[i++];
+            if('0'<=c&&c<='9'){
+                res = res * 10 + (c-'0');
+                if(res>2147483647){
+                    if(sign==2)
+                        return -2147483648;
+                    else
+                        return 2147483647;
+                }
+            }else
+                break;
+        }while(true);
+        if(sign==2)
+            res = -res;
+        return res;
+    }
+};//19ms
+```
+
+```c++
+//别人家的代码
+int atoi(const char *str) {
+    int sign = 1, base = 0, i = 0;
+    while (str[i] == ' ') { i++; }
+    if (str[i] == '-' || str[i] == '+') {
+        sign = 1 - 2 * (str[i++] == '-'); 
+    }
+    while (str[i] >= '0' && str[i] <= '9') {
+        if (base >  INT_MAX / 10 || (base == INT_MAX / 10 && str[i] - '0' > 7)) {
+            if (sign == 1) return INT_MAX;
+            else return INT_MIN;
+        }
+        base  = 10 * base + (str[i++] - '0');
+    }
+    return base * sign;
+}
+```
+
+
+
+#### [Palindrome Number](https://leetcode.com/problems/palindrome-number/) 
+
+> Determine whether an integer is a palindrome. Do this without extra space.
+>
+> [click to show spoilers.](https://leetcode.com/problems/palindrome-number/#)
+>
+> **Some hints:**Could negative integers be palindromes? (ie, -1)If you are thinking of converting the integer to string, note the restriction of using extra space.You could also try reversing an integer. However, if you have solved the problem "Reverse Integer", you know that the reversed integer might overflow. How would you handle such case?There is a more generic way of solving this problem.
+
+```c++
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if(x<0)
+            return false;
+        int count=0,temp;
+        temp =x;
+        while(temp){
+            temp/=10;
+            count++;
+        }
+        int tenc=1,tent=1;
+        for(int i=0;i<count-1;i++) tenc*=10;
+        while(temp<count/2){
+            if((x/tent)%10!=(x/(tenc/tent))%10)
+                return false;
+            temp++;
+            tent*=10;
+        }
+        return true;
+    }
+};//205ms
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if(x<0)
+            return false;
+        int count=1,temp=x/10;
+        int tenc=1,tent=1;
+        // temp =x;
+        while(temp){
+            temp/=10;
+            count++;
+            tenc*=10;
+        }
+        // for(int i=0;i<count-1;i++) tenc*=10;
+        count=count>>1;
+        while(temp++<count){
+            if((x/tent)%10!=(x/(tenc/tent))%10)
+                return false;
+            // temp++;
+            tent*=10;
+        }
+        return true;
+    }
+};//69ms
+```
+
+```c++
+//别人家的代码
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if(x<0|| (x!=0 &&x%10==0)) return false;
+        int sum=0;
+        while(x>sum)
+        {
+            sum = sum*10+x%10;
+            x = x/10;
+        }
+        return (x==sum)||(x==sum/10);
+    }
+};
+```
+
