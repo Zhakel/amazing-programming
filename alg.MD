@@ -713,7 +713,27 @@ public:
 > ```
 
 ```c++
-
+//别人家的代码（改）
+class Solution {
+public:
+    bool isMatch(string s, string p) {
+        if(p[0]=='\0')
+            return (s[0]=='\0');
+        if(p[1]!='*'){
+            if(p[0]!=s[0]&&(p[0]!='.'||s[0]=='\0'))
+                return false;
+            else
+                return isMatch(s=s.substr(1),p=p.substr(1));
+        }else{
+            if(isMatch(s,p.substr(2)))
+                return true;
+            while(p[0]==s[0]||(p[0]=='.'&&s[0]!='\0'))
+                if(isMatch(s=s.substr(1),p.substr(2)))
+                    return true;
+            return false;
+        }
+    }
+};//99ms
 ```
 
 #### [Container With Most Water](https://leetcode.com/problems/container-with-most-water/) 
@@ -779,4 +799,36 @@ public:
         return res;
     }
 };//82ms
+```
+#### [Roman to Integer](https://leetcode.com/problems/roman-to-integer/) 
+
+> Given a roman numeral, convert it to an integer.
+>
+> Input is guaranteed to be within the range from 1 to 3999.
+
+```c++
+class Solution {
+public:
+    int romanToInt(string s) {
+        if(s=="")
+            return 0;
+        int res =0,i=0,length = s.size();
+        map<char,int> rom;
+        rom['I']=1;
+        rom['V']=5;
+        rom['X']=10;
+        rom['L']=50;
+        rom['C']=100;
+        rom['D']=500;
+        rom['M']=1000;
+        for(;i<length-1;i++){
+            if(rom[s[i]]<rom[s[i+1]])
+                res-=rom[s[i]];
+            else
+                res+=rom[s[i]];
+        }
+        res+=rom[s[i]];
+        return res;
+    }
+};//49ms
 ```
