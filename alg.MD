@@ -286,7 +286,33 @@ int lengthOfLongestSubstring(string s) {
 > ```
 
 ```c++
-
+//别人家代码
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int n1=nums1.size();
+        int n2=nums2.size();
+        if(n1>n2)
+            return findMedianSortedArrays(nums2,nums1);
+        int l=0,h=2*n1,mid1,mid2;
+        int a1,b1,a2,b2;
+        while(l<=h){
+            mid1 = (l+h)/2;
+            mid2 = n1+n2-mid1;
+            a1 = (mid1==0)?INT_MIN:nums1[(mid1-1)/2];
+            b1 = (mid2==0)?INT_MIN:nums2[(mid2-1)/2];
+            a2 = (mid1==2*n1)?INT_MAX:nums1[mid1/2];
+            b2 = (mid2==2*n2)?INT_MAX:nums2[mid2/2];
+            if(a1>b2)
+                h = mid1-1;
+            else if(a2<b1)
+                l = mid1+1;
+            else
+                break;
+        }
+        return (double)(max(a1,b1)+min(a2,b2))/2;
+    }
+};//52ms
 ```
 
 
@@ -663,3 +689,94 @@ public:
 };
 ```
 
+#### [*Regular Expression Matching](https://leetcode.com/problems/regular-expression-matching) 
+
+> Implement regular expression matching with support for `'.'` and `'*'`.
+>
+> ```
+> '.' Matches any single character.
+> '*' Matches zero or more of the preceding element.
+>
+> The matching should cover the entire input string (not partial).
+>
+> The function prototype should be:
+> bool isMatch(const char *s, const char *p)
+>
+> Some examples:
+> isMatch("aa","a") → false
+> isMatch("aa","aa") → true
+> isMatch("aaa","aa") → false
+> isMatch("aa", "a*") → true
+> isMatch("aa", ".*") → true
+> isMatch("ab", ".*") → true
+> isMatch("aab", "c*a*b") → true
+> ```
+
+```c++
+
+```
+
+#### [Container With Most Water](https://leetcode.com/problems/container-with-most-water/) 
+
+> Given *n* non-negative integers *a1*, *a2*, ..., *an*, where each represents a point at coordinate (*i*, *ai*). *n* vertical lines are drawn such that the two endpoints of line *i* is at (*i*, *ai*) and (*i*, 0). Find two lines, which together with x-axis forms a container, such that the container contains the most water.
+>
+> Note: You may not slant the container and *n* is at least 2.
+
+```c++
+class Solution {
+public:
+    int maxArea(vector<int>& height) {//递归超时，加入hmaxi和hmaxj后大大提升速度（300ms）
+        int m = 0,length=height.size(),temp,hmaxi=0,hmaxj;
+        for(int i=0;i<length-1;i++){
+            if(hmaxi<height[i])
+                hmaxi = height[i];
+            else
+                continue;
+            hmaxj=0;
+            for(int j=length-1;j>i;j--){
+                if(height[j]<height[i]){
+                    if(height[j]>hmaxj){
+                        hmaxj = height[j];
+                        temp = hmaxj*(j-i);
+                        if(temp>m)
+                            m=temp;
+                    }
+                }else{
+                    temp = height[i]*(j-i);
+                    if(temp>m)
+                        m=temp;
+                        break;
+                }
+            }
+        }
+        return m;
+    }
+};//16ms
+```
+
+
+
+#### [Integer to Roman](https://leetcode.com/problems/integer-to-roman/) 
+
+> Given an integer, convert it to a roman numeral.
+>
+> Input is guaranteed to be within the range from 1 to 3999.
+
+```c++
+class Solution {
+public:
+    string intToRoman(int num) {
+        string rm[]={
+            "","I","II","III","IV","V","VI","VII","VIII","IX",
+            "","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+            "","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+            "","M","MM","MMM"};
+        string res="";
+        res.append(rm[30+num/1000%10]);
+        res.append(rm[20+num/100%10]);
+        res.append(rm[10+num/10%10]);
+        res.append(rm[num%10]);
+        return res;
+    }
+};//82ms
+```
