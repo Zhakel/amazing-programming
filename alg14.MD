@@ -370,3 +370,249 @@ public:
         return fast->next;
     }//3ms
 ```
+#### [Valid Parentheses](https://leetcode.com/problems/valid-parentheses/) 
+
+> Given a string containing just the characters `'('`, `')'`, `'{'`, `'}'`, `'['` and `']'`, determine if the input string is valid.
+>
+> The brackets must close in the correct order, `"()"` and `"()[]{}"` are all valid but `"(]"` and `"([)]"` are not.
+
+```c++
+class Solution {
+public:
+    bool isValid(string s) {
+        int i=0,size=s.length();
+        if(size%2!=0) return false;
+        //vector<char> str = {'(',')','{','}','[',']'};
+        stack<char> schar;
+        while(i<size){
+            switch(s[i]){
+                case '(':
+                    schar.push('(');
+                    i++;
+                    break;
+                case ')':
+                    i++;
+                    if(!schar.empty()&&schar.top()=='(') schar.pop();
+                    else return false;
+                    break;
+                case '{':
+                    schar.push('{');
+                    i++;
+                    break;
+                case '}':
+                    i++;
+                    if(!schar.empty()&&schar.top()=='{') schar.pop();
+                    else return false;
+                    break;
+                case '[':
+                    schar.push('[');
+                    i++;
+                    break;
+                case ']':
+                    i++;
+                    if(!schar.empty()&&schar.top()=='[') schar.pop();
+                    else return false;
+                    break;
+                default: return false;
+            }
+        }
+        return schar.empty();
+    }
+};//3ms
+```
+
+#### [Merge Two Sorted Lists](https://leetcode.com/problems/merge-two-sorted-lists)   
+
+> Merge two sorted linked lists and return it as a new list. The new list should be made by splicing together the nodes of the first two lists.
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* l1, ListNode* l2) {
+        if(l1==NULL) return l2;
+        if(l2==NULL) return l1;
+        ListNode *res = new ListNode(0);
+        ListNode *head=res;
+        while(l1&&l2){
+            if(l1->val<l2->val){
+                head->next = new ListNode(l1->val);
+                l1=l1->next;
+            }else{
+                head->next = new ListNode(l2->val);
+                l2=l2->next;
+            }
+            head = head->next;
+        }
+        if(l1){
+            // head->next = new ListNode(l1->val);//居然慢了。。。
+            // l1=l1->next;
+            // head = head->next;
+            head->next = l1;
+        }
+        if(l2){
+            // head->next = new ListNode(l2->val);
+            // l2=l2->next;
+            // head = head->next;
+            head->next = l2;
+        }
+        return res->next;
+        
+    }
+};//13ms
+```
+#### [Generate Parentheses](https://leetcode.com/problems/generate-parentheses/) 
+
+> Given *n* pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+>
+> For example, given *n* = 3, a solution set is:
+>
+> ```
+> [
+>   "((()))",
+>   "(()())",
+>   "(())()",
+>   "()(())",
+>   "()()()"
+> ]
+> ```
+
+```c++
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        if (n <= 0) return res;
+
+        string curr(2*n, ' ');
+        generateParenthesis(n, res, curr, 0, 0);
+
+        return res;
+    }
+
+    void generateParenthesis(int n, vector<string>& res, string& curr, int left, int right) {
+        if (left + right >= 2 * n) {
+            res.push_back(curr);
+            return;
+        }
+
+        if (left < n) {
+            curr[left+right] = '(';
+            generateParenthesis(n, res, curr, left+1, right);
+        }
+
+        if (left > right) {
+            curr[left+right] = ')';
+            generateParenthesis(n, res, curr, left, right+1);
+        }
+    }
+};
+```
+
+```c++
+//别人家的代码
+class Solution {
+public:
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        if (n <= 0) return res;
+
+        string curr(2*n, ' ');
+        generateParenthesis(n, res, curr, 0, 0);
+
+        return res;
+    }
+
+    void generateParenthesis(int n, vector<string>& res, string& curr, int left, int right) {
+        if (left + right >= 2 * n) {
+            res.push_back(curr);
+            return;
+        }
+
+        if (left < n) {
+            curr[left+right] = '(';
+            generateParenthesis(n, res, curr, left+1, right);
+        }
+
+        if (left > right) {
+            curr[left+right] = ')';
+            generateParenthesis(n, res, curr, left, right+1);
+        }
+    }
+};
+```
+
+#### [Merge k Sorted Lists](https://leetcode.com/problems/merge-k-sorted-lists/) 
+
+> Merge *k* sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
+
+```c++
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        ListNode *res = new ListNode(0);
+        int size = lists.size();
+        vector<int> nums;
+        for(int i=0;i<size;i++){
+            while(lists[i]!=NULL){
+                nums.push_back(lists[i]->val);
+                lists[i]=lists[i]->next;
+            }
+        }
+        sort(nums.begin(),nums.end());
+        ListNode *head = res;
+        for(int i=0;i<nums.size();i++){
+            head->next=new ListNode(nums[i]);
+            head = head->next;
+        }
+        return res->next;
+    }
+};//29ms
+```
+
+```c++
+//别人家的代码
+class Solution {
+public:
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        if(lists.empty()) return nullptr;
+        return mergeKLists(lists, 0, lists.size());
+    }
+private:
+    ListNode *mergeKLists(vector<ListNode *> &lists, int beg, int end){
+        if(end - beg == 1) return lists[beg];   //only one list
+        int mid = beg + (end - beg)/2;
+        ListNode *l1 = mergeKLists(lists, beg, mid);    //merge list among[beg, mid)
+        ListNode *l2 = mergeKLists(lists, mid, end);    //merge list among[mid, end)
+        ListNode prehead(0), *pre = &prehead;
+        while(l1 && l2){
+            if(l1->val <= l2->val){
+                pre->next = l1;
+                l1 = l1->next;
+            }
+            else{
+                pre->next = l2;
+                l2 = l2->next;
+            }
+            pre = pre->next;
+        }
+        pre->next = (l1)? l1: l2;
+        return prehead.next;
+    }
+};//23ms
+```
