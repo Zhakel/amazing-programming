@@ -338,3 +338,341 @@ public:
     }
 };
 ```
+#### [Next Permutation](https://leetcode.com/problems/next-permutation/) 
+
+> Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
+>
+> If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+>
+> The replacement must be in-place, do not allocate extra memory.
+>
+> Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+> `1,2,3` → `1,3,2`
+> `3,2,1` → `1,2,3`
+> `1,1,5` → `1,5,1`
+
+```c++
+class Solution {
+public:
+    static bool bigger(int l,int r){
+        return (l<r);
+    }
+    void nextPermutation(vector<int>& nums) {
+        if(nums.size()<2) return;
+        for(int i=nums.size()-1;i>0;i--){
+            if(nums[i]>nums[i-1]){
+                int temp,index;
+                for(int j=i;j<nums.size();j++){
+                    if(nums[j]>nums[i-1]) index=j;
+                    else break;
+                }
+                temp = nums[i-1];
+                nums[i-1]=nums[index];
+                nums[index]=temp;
+                sort(nums.begin()+i,nums.end(),bigger);
+                return;
+            }
+        }
+        sort(nums.begin(),nums.end());//完全逆序，reverse效率因此高得多
+    }
+};//25ms
+```
+
+```c++
+//别人家的代码
+class Solution {
+public:
+    void nextPermutation(vector<int>& nums) {
+        // next_permutation(nums.begin(), nums.end());
+        vector<int>::reverse_iterator i = is_sorted_until(nums.rbegin(), nums.rend()); 
+        if(i != nums.rend()) swap(*i, *upper_bound(nums.rbegin(), i, *i)); // Important! 
+        reverse(nums.rbegin(), i);
+    }
+};//9ms
+```
+#### [Search in Rotated Sorted Array](https://leetcode.com/problems/search-in-rotated-sorted-array/) 
+
+> Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+>
+> (i.e., `0 1 2 4 5 6 7` might become `4 5 6 7 0 1 2`).
+>
+> You are given a target value to search. If found in the array return its index, otherwise return -1.
+>
+> You may assume no duplicate exists in the array.
+
+```c++
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        if(nums.size()==0) return -1;
+        //if(nums.size()==1) return (nums[0]==target)?0:-1;
+        int left=0,right=nums.size()-1,mid,pivot=0;
+        while(left<=right){
+            mid=(left+right)/2;
+            if(nums[mid]>=nums[0]) left=mid+1;
+            else{
+                if(mid>0&&nums[mid-1]>=nums[0]){
+                    pivot=mid;
+                    break;
+                }
+                right=mid-1;
+            }
+        }
+        left=0;right=nums.size()-1;
+        //cout<<pivot<<endl;
+        if(pivot!=0){
+            if(nums[nums.size()-1]>=target) left = pivot;
+            else right = pivot-1;
+        }
+        while(left<=right){
+            mid=(left+right)/2;
+            if(nums[mid]==target) return mid;
+            else if(nums[mid]>target) right = mid-1;
+            else left = mid+1;
+        }
+        return -1;
+    }
+};//6ms
+```
+
+```c++
+//别人家的代码,不进行pivot的查找，直接针对target
+class Solution {
+public:
+    int search(vector<int>& nums, int target) {
+        int h = nums.size();
+        int l = 0;
+        while(h>l){
+            int mid = (h+l)/2;
+                //     double num = (nums[mid] < nums[0]) == (target < nums[0])
+                //   ? nums[mid]
+                //   : target < nums[0] ? -INFINITY : INFINITY;
+
+            double num = ((nums[0]<=nums[mid]) == (nums[0]<=target))? nums[mid]: target<nums[0]? -INFINITY:INFINITY;
+            if(target<num){
+                h = mid;
+            }
+            else if(target>num){
+                l = mid+1;
+            }
+            else{
+                return mid;
+            }
+        }
+        return -1;
+        
+    }
+};//3ms
+```
+
+#### [Search for a Range](https://leetcode.com/problems/search-for-a-range/) 
+
+> Given an array of integers sorted in ascending order, find the starting and ending position of a given target value.
+>
+> Your algorithm's runtime complexity must be in the order of *O*(log *n*).
+>
+> If the target is not found in the array, return `[-1, -1]`.
+>
+> For example,
+> Given `[5, 7, 7, 8, 8, 10]` and target value 8,
+> return `[3, 4]`.
+
+```c++
+class Solution {
+public:
+    vector<int> searchRange(vector<int>& nums, int target) {
+        vector<int> res;
+        //if(nums.empty()) return res;
+        int left=0,right=nums.size()-1,mid;
+        while(left<=right){
+            mid=(left+right)/2;
+            if(nums[mid]==target){
+                //cout<<"ok"<<endl;
+                left=right=mid;
+                while(left>=0&&nums[left]==target) left--;
+                while(right<nums.size()&&nums[right]==target) right++;
+                //cout<<left<<" "<<right<<endl;
+                //for(int i=left+1;i<right;i++) res.push_back(i);
+                return {left+1,right-1};
+            }else if(nums[mid]>target) right=mid-1;
+            else left = mid+1;
+        }
+        return {-1,-1};
+    }
+};//9ms
+```
+
+#### [Search Insert Position](https://leetcode.com/problems/search-insert-position/) 
+
+> Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+>
+> You may assume no duplicates in the array.
+>
+> Here are few examples.
+> [1,3,5,6], 5 → 2
+> [1,3,5,6], 2 → 1
+> [1,3,5,6], 7 → 4
+> [1,3,5,6], 0 → 0
+>
+
+```c++
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        if(nums.empty()) return 0;
+        if(nums[0]>=target) return 0;
+        int left=0,right=nums.size()-1,mid;
+        while(left<=right){
+            mid=(left+right)/2;
+            if(nums[mid]<target) left=mid+1;
+            else if(nums[mid]>target) right = mid-1;
+            else return mid;
+        }
+        return (nums[mid]>target)?mid:mid+1;
+    }
+  /*
+         int low = 0;
+         int high = nums.size()-1;
+         
+         while(low<=high)
+         {
+           int mid = low+ (high-low)/2;
+           if(nums[mid]<target) low= mid+1;
+           else high = mid-1; 
+         }        
+        return low;
+  */
+};//6ms
+```
+
+#### [Valid Sudoku](https://leetcode.com/problems/valid-sudoku/) 
+
+> Determine if a Sudoku is valid, according to: [Sudoku Puzzles - The Rules](http://sudoku.com.au/TheRules.aspx).
+>
+> The Sudoku board could be partially filled, where empty cells are filled with the character `'.'`.
+>
+> ![img](http://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Sudoku-by-L2G-20050714.svg/250px-Sudoku-by-L2G-20050714.svg.png)
+>
+> A partially filled sudoku which is valid.
+>
+> **Note:**
+> A valid Sudoku board (partially filled) is not necessarily solvable. Only the filled cells need to be validated.
+
+```c++
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        int tr,tc;
+        
+        for(int i=0;i<9;i++){
+            vector<int> judgerow(10,0);
+            vector<int> judgecol(10,0);
+            for(int j=0;j<9;j++){
+                tr=board[i][j]-'0';
+                tc=board[j][i]-'0';
+                if(tr>0){
+                    if(judgerow[tr]==0) judgerow[tr]++;
+                    else return false;
+                }
+                if(tc>0){
+                    if(judgecol[tc]==0) judgecol[tc]++;
+                    else return false;                    
+                }                
+            }
+        }
+        
+        for(int i=0;i<9;i+=3){
+            for(int j=0;j<9;j+=3){
+                vector<int> judgers(10,0);
+                for(int m=i;m<i+3;m++){
+                    for(int n=j;n<j+3;n++){
+                        tr=board[m][n]-'0';
+                        if(tr>0){
+                            if(judgers[tr]==0) judgers[tr]++;
+                            else return false;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+};//19ms
+```
+
+```c++
+//别人家的代码 6ms bool型
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        // validate Row
+        for (int i = 0; i < board.size(); i++) {
+            if (!validateRow(board[i])) {
+                return false;
+            }
+        }
+        
+        // validate col
+        for (int i = 0; i < board[0].size(); i++) {
+            if (!validateCol(board, i)) {
+                return false;
+            }
+        }
+        
+        // validate square
+        for (int i = 0; i < board.size(); i+=3) {
+			for (int j = 0; j < board[0].size(); j+=3) {
+                if (!validateSquare(board, i, j)) {
+                    return false;
+                }
+            }
+        }
+        
+        return true;
+    }
+    
+    bool validateRow(vector<char>& row) {
+        bool used[9] = {false};
+        
+        for (auto c : row) {
+			if (c != '.' && used[c - '1']) {
+                return false;
+            } else if (c != '.') {
+                used[c - '1'] = true;
+            }
+        }
+        
+        return true;
+    }
+    
+    bool validateCol(vector<vector<char>>& board, int col) {
+        bool used[9] = {false};
+        
+        for (int i = 0; i < 9; i++) {
+			if (board[i][col] != '.' && used[board[i][col] - '1']) {
+                return false;
+            } else if (board[i][col] != '.') {
+                used[board[i][col] - '1'] = true;
+            }
+        }
+        
+        return true;
+    }
+    
+    bool validateSquare(vector<vector<char>>& board, int row, int col) {
+        bool used[9] = {false};
+        
+        for (int i = row; i < row + 3; i++) {
+            for (int j = col; j < col + 3; j++) {
+                if (board[i][j] != '.' && used[board[i][j] - '1']) {
+                    return false;
+                } else if (board[i][j] != '.') {
+                    used[board[i][j] - '1'] = true;
+                }
+        	}
+        }
+        
+        return true;
+    }
+};
+```
